@@ -189,5 +189,9 @@ private:
         }
     };
 
+    void Normalize_() {
+        
+    }
+
     LinkedList<Term> polynom_;
 };
