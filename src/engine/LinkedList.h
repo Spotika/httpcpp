@@ -1,114 +1,110 @@
-#pragma once 
+#pragma once
 
-
-#include <cstddef>
 #include <stdexcept>
 
 
-template<typename T>  // TODO: make desctructor
+template <class T>
 class LinkedList {
-protected:
-    struct Node {
-        Node* next = nullptr;
-        Node* prev = nullptr;
-        T data = nullptr;
-
-        Node (T data) : data{data} {}
-    };
 public:
+
+    LinkedList() {
+        head_->next = tail_;
+        tail_->prev = head_;
+    }
+
     void Push(T data) {
-        Node* new_node = new Node(data);
-        if (size_ == 0) {
-            head_ = new_node;
-            tail_ = new_node;
-            size_ = 1;
-        } else if (size_ == 1) {
-            tail_ = new_node;
-            tail_->prev = head_;
-            head_->next = tail_;
-            size_ = 2;
-        } else {
-            ++size_;
-            tail_->next = new_node;
-            new_node->prev = tail_;
-            tail_ = new_node;
-        }
+        auto new_node = new Node(data);
+
+        std::swap(tail_->data, new_node->data);
+        tail_->next = new_node;
+        new_node->prev = tail_;
+        tail_ = new_node;
+        ++size_;
     }
 
-    void Erase(size_t index) {
-        if (index >= size_) {
-            throw std::invalid_argument("Index out of range");
-        }
-
-        if (size_ == 1) {
-            delete head_;
-            head_ = nullptr;
-            tail_ = nullptr;
-            size_ = 0;
-            return;
-        } 
-
-        auto current = head_;
-        for (size_t i = 0; i < index; ++i) {
-            current = current->next;
-        }
-
-        auto next = current->next;
-        auto prev = current->prev;
-
-        if (index == 0) {
-            head_ = next;
-        } else if (index == size_ - 1) {
-            tail_ = prev;
-        }
-
-        if (next) next->prev = prev;
-        if (prev) prev->next = next;
-
-        --size_;
-        delete current;
-    }
-
-    T& operator[] (size_t index) {
-        if (index >= size_) {
-            throw std::invalid_argument("Index out of range");
-        }
-
-        auto current = head_;
-        while (index --> 0) {
-            current = current->next;
-        }
-        return current->data;
-    }
-
-    size_t size() {
+    size_t getSize() const {
         return size_;
     }
 
-    void Sort() {
+    T& operator[](size_t index) const {
+        auto current_node = head_->next;
 
-        auto less = std::less<T>{};
-        auto is_sorted = [less](LinkedList<T> &sp) {
-            for (int i = 0; i < sp.size() - 1; ++i) {
-                if (less(sp[i + 1], sp[i])) {
+        if (index >= size_) {
+            throw std::out_of_range("Index out of range");
+        }
+        
+        while (index --> 0) {
+            current_node = current_node->next;
+        }
+        return *(current_node->data);
+    }
+
+    void Sort() {
+        auto check = [&](){
+            for (int i = 0; i < getSize() - 1; ++i) {
+                if (operator[](i) > operator[](i + 1)) {
                     return false;
                 }
             }
             return true;
         };
 
-        while (!is_sorted(*this)) {
-            for (int i = 0; i < size() - 1; ++i) {
-                if (less((*this)[i + 1], (*this)[i])) {
-                    std::swap((*this)[i], (*this)[i + 1]);
+        while (!check()) {
+            for (int i = 0; i < getSize() - 1; ++i) {
+                if (operator[](i) > operator[](i + 1)) {
+                    std::swap(operator[](i), operator[](i + 1));
                 }
             }
-        }        
-        
+        }
     }
 
-protected:
+    void Clear() {
+        while (getSize() != 0) {
+            Erase_(head_->next); // WARNING: may not workdp
+        }
+    }
+
+    void Pop(size_t index) {
+        if (index >= getSize()) {
+            throw std::out_of_range("Index out of range");
+        }
+
+        auto current_node = head_->next;
+        while (index --> 0) {
+            current_node = current_node->next;
+        }
+        Erase_(current_node);
+    }
+
+private:
+    struct Node {
+        T* data = nullptr;
+        Node* prev = nullptr;
+        Node* next = nullptr;
+
+        Node() = default;
+
+        Node(
+            T data
+        ) {
+            this->data = new T(data);
+        }
+
+        ~Node() {
+            if (data) {
+                delete data;
+            }
+        }
+    };
+    
+    void Erase_(Node* target) {
+        target->prev->next = target->next;
+        target->next->prev = target->prev;
+        --size_;
+        delete target;
+    }
+
+    Node* head_ = new Node();
+    Node* tail_ = new Node();
     size_t size_ = 0;
-    Node* head_ = nullptr;
-    Node* tail_ = nullptr;
 };
