@@ -252,6 +252,12 @@ private:
             Term result(other);
             result.weight += weight;
 
+            if (result.weight == 0) {
+                for (int i = 0; i < 26; ++i) {
+                    result.powers[i] = 0;
+                }
+            }
+
             return result;
         }
 
@@ -263,6 +269,12 @@ private:
             }
 
             weight += other.weight;
+
+            if (weight == 0) {
+                for (int i = 0; i < 26; ++i) {
+                    powers[i] = 0;
+                }
+            }
 
             return *this;
         }
@@ -290,7 +302,7 @@ private:
         polynom_ = sp;
 
         for (int i = polynom_.getSize() - 1; i >= 0; --i) {
-            if (i != 0) {
+            if (polynom_.getSize() != 1) {
                 if (polynom_[i].weight == 0) {
                     polynom_.Pop(i);
                 }
