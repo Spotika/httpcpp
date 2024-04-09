@@ -143,6 +143,8 @@ public:
                     break;
             }
         }
+
+        polynom_.Sort();
     }
 
 private:
@@ -190,6 +192,24 @@ private:
                 }
             }
             return result;
+        }
+
+        size_t sumOfPowers() const {
+            size_t result = 0;
+
+            for (int i = 0; i < 26; ++i) {
+                result += powers[i];
+            }
+            
+            return result;
+        }
+
+        bool operator<(const Term& other) const {
+            return sumOfPowers() > other.sumOfPowers();
+        }
+
+        bool operator>(const Term& other) const {
+            return sumOfPowers() < other.sumOfPowers();
         }
     };
 
