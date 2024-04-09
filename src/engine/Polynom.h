@@ -12,6 +12,10 @@
 class Polynom : public IWriteble {
 public:
 
+    Polynom() {
+        read_from_string("");
+    }
+
     Polynom(std::string polynom_string) {
         read_from_string(polynom_string);
     }

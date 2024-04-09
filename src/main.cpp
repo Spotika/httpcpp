@@ -12,18 +12,18 @@
 #include "helpers.h"
 #include "engine/Models.h"
 #include "engine/LinkedList.h"
-#include "engine/DataBase.h"
 #include "engine/Polynom.h"
 
 int main() {
 
     httplib::Server svr;
 
+    LinkedList<Polynom> database;
+
     svr.set_post_routing_handler([](const auto& req, auto& res) {
         res.set_header("Access-Control-Allow-Origin", "*");
         res.set_header("Access-Control-Allow-Headers", "*");
     });
-
 
     // svr.Post("/ping", ParseBody<TestModel>([](const httplib::Request &, httplib::Response &res, TestModel parsedBody) {
     //     Json::Value json;
@@ -43,13 +43,51 @@ int main() {
         Json::Value json;
         json["response"] = "OK";
 
-        // req.getQueryParam("id");
-        
         std::string pol = req.get_param_value("polynom");
         // std::cout << pol << std::endl;
-        Polynom test(pol);
+
+        // req.getQueryParam("id");
+        Polynom test;
+        try {
+            test.read_from_string(pol);
+        } catch (const std::exception& e) {
+            throw HTTPException(e.what(), HTTP_STATUS_CODE::BAD_REQUEST);
+        }
 
         json["polynom"] = test.write_to_string();
+
+        JSON_RESPONSE(json);
+    });
+
+    svr.Post("/add", [&database](const auto& req, auto& res) {
+        Json::Value json;
+        json["response"] = "OK";
+
+        std::string pol = req.get_param_value("polynom");
+        // std::cout << pol << std::endl;
+
+        // req.getQueryParam("id");
+        Polynom p;
+        try {
+            p.read_from_string(pol);
+        } catch (const std::exception& e) {
+            throw HTTPException(e.what(), HTTP_STATUS_CODE::BAD_REQUEST);
+        }
+
+        database.Push(p);
+
+        json["polynom"] = p.write_to_string();
+
+        JSON_RESPONSE(json);
+    });
+
+    svr.Get("/list", [&database](const auto& req, auto& res) {
+        Json::Value json;
+        auto &response = json["response"];
+
+        for (int i = 0; i < database.getSize(); i++) {
+            response[i] = database[i].write_to_string();
+        }
 
         JSON_RESPONSE(json);
     });
@@ -57,7 +95,7 @@ int main() {
     svr.set_exception_handler([](auto& req, auto& res, std::exception_ptr ex) {
         Json::Value json;
 
-        json["status"] = "Internal server error";
+        json["status"] = "error";
         try {
             if (ex) {
                 std::rethrow_exception(ex);
