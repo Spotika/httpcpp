@@ -194,7 +194,7 @@ private:
             return result;
         }
 
-        size_t sumOfPowers() const {
+        size_t SumOfPowers() const {
             size_t result = 0;
 
             for (int i = 0; i < 26; ++i) {
@@ -205,16 +205,55 @@ private:
         }
 
         bool operator<(const Term& other) const {
-            return sumOfPowers() > other.sumOfPowers();
+            int sum = static_cast<int>(SumOfPowers()) - static_cast<int>(other.SumOfPowers());        
+            if (sum == 0) {
+                return ComparePowerLiterals(other);
+            }
+
+            return sum > 0;
         }
 
-        bool operator>(const Term& other) const {
-            return sumOfPowers() < other.sumOfPowers();
+        bool EqualPowers(const Term& other) const {
+            for (int i = 0; i < 26; ++i) {
+                if (powers[i] != other.powers[i]) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        bool ComparePowerLiterals(const Term& other) const {
+            std::string first;
+            std::string second;
+
+            for (int i = 0; i < 26; ++i ) {
+                if (powers[i] != 0) {
+                    first += static_cast<char>(i + 'a');
+                }
+                if (other.powers[i] != 0) {
+                    second += static_cast<char>(i + 'a');
+                }
+            }
+            return first < second;
+        }
+
+        Term operator+(const Term& other) const {
+            if (!EqualPowers(other)) {
+                throw std::invalid_argument(
+                    "Polynoms with different powers cannot be added"
+                );
+            }
+
+            Term result(other);
+            result.weight += weight;
+
+            return result;
         }
     };
 
     void Normalize_() {
-        
+        // LinkedList<Term> sp
+
     }
 
     LinkedList<Term> polynom_;

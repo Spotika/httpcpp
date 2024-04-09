@@ -42,7 +42,7 @@ public:
     void Sort() {
         auto check = [&](){
             for (int i = 0; i < getSize() - 1; ++i) {
-                if (operator[](i) > operator[](i + 1)) {
+                if (std::less<T>{}(operator[](i + 1), operator[](i))) {
                     return false;
                 }
             }
@@ -51,7 +51,7 @@ public:
 
         while (!check()) {
             for (int i = 0; i < getSize() - 1; ++i) {
-                if (operator[](i) > operator[](i + 1)) {
+                if (std::less<T>{}(operator[](i + 1), operator[](i))) {
                     std::swap(operator[](i), operator[](i + 1));
                 }
             }
