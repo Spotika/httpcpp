@@ -57,6 +57,8 @@ public:
                 case BEGIN: // Начало парсинга
                     if (string[i] == '-') {
                         current_term.weight = -1;
+                    } else if (string[i] == '+') {
+                        current_term.weight = 1;
                     } else {
                         current_term.weight = 1; --i;
                     }
@@ -145,6 +147,7 @@ public:
         }
 
         polynom_.Sort();
+        Normalize_();
     }
 
 private:
@@ -164,7 +167,9 @@ private:
             }
 
             if (weight == 1) {
-
+                if (SumOfPowers() == 0) {
+                    result += '1';
+                }
             } else if (weight == -1) {
                 bool flag = false;
                 for (int i = 0; i < 26; ++i) {
@@ -249,11 +254,48 @@ private:
 
             return result;
         }
+
+        Term& operator+=(const Term& other) {
+            if (!EqualPowers(other)) {
+                throw std::invalid_argument(
+                    "Polynoms with different powers cannot be added"
+                );
+            }
+
+            weight += other.weight;
+
+            return *this;
+        }
     };
 
     void Normalize_() {
-        // LinkedList<Term> sp
+        LinkedList<Term> sp;
 
+
+        Term current_term = polynom_[0];
+
+        for (int i = 1; i < polynom_.getSize(); ++i) {
+            if (current_term.EqualPowers(polynom_[i])) {
+                current_term += polynom_[i];
+            } else {
+                sp.Push(current_term);
+                current_term = polynom_[i];
+            }
+        }
+
+        sp.Push(current_term);
+        
+        polynom_.Clear();        
+        
+        polynom_ = sp;
+
+        for (int i = polynom_.getSize() - 1; i >= 0; --i) {
+            if (i != 0) {
+                if (polynom_[i].weight == 0) {
+                    polynom_.Pop(i);
+                }
+            }
+        }
     }
 
     LinkedList<Term> polynom_;
