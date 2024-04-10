@@ -91,9 +91,7 @@ int main() {
     });
 
     svr.Get("/calculate", 
-        [&database](const httplib::Request &req, httplib::Response &res) {
-
-            
+        [&database](const httplib::Request &req, httplib::Response &res) {    
             Json::Reader reader;    
 
             Json::Value inputArray;
@@ -114,6 +112,18 @@ int main() {
             JSON_RESPONSE(json);
         }
     );
+
+    svr.Get("/compare", [&database](const auto& req, auto& res) {
+        Json::Value json;
+
+        Polynom lhs(req.get_param_value("lhs"));
+        Polynom rhs(req.get_param_value("rhs"));
+
+
+        json["response"] = lhs == rhs;
+
+        JSON_RESPONSE(json);
+    });
 
     svr.set_exception_handler([](auto& req, auto& res, std::exception_ptr ex) {
         Json::Value json;
