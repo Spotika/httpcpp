@@ -161,6 +161,18 @@ public:
             }
             return true;
         }
+
+        Term operator*(const Term& other) const {
+            Term result;
+
+            result.weight = other.weight * weight;
+
+            for (int i = 0; i < 26; ++i) {
+                result.powers[i] = powers[i] + other.powers[i];
+            }
+
+            return result;
+        }
     };
 
     LinkedList<Term> polynom;
@@ -346,6 +358,29 @@ public:
 
         for (int i = 0; i < other.polynom.getSize(); ++i) {
             result.polynom.Push(other.polynom[i]);
+        }
+
+        result.Normalize_();
+        return result;
+    }
+
+    Polynom operator*(const Polynom& other) const {
+        Polynom result;
+
+        // result.polynom ;
+
+        for (int i = 0; i < other.polynom.getSize(); ++i) {
+            result = result + operator*(other.polynom[i]);
+        }
+        result.Normalize_();
+        return result;
+    }
+
+    Polynom operator*(const Term& other) const {
+        Polynom result;
+
+        for (int i = 0; i < polynom.getSize(); ++i) {
+            result.polynom.Push(polynom[i] * other);
         }
 
         result.Normalize_();

@@ -123,6 +123,18 @@ int main() {
         JSON_RESPONSE(json);
     });
 
+    svr.Get("/multiply", [&database](const auto& req, auto& res) {
+        Json::Value json;
+        
+        Polynom lhs(req.get_param_value("lhs"));
+        Polynom rhs(req.get_param_value("rhs"));
+
+        json["response"] = (lhs * rhs).write_to_string();
+
+        JSON_RESPONSE(json);
+    });
+
+
     svr.Get("/compare", [&database](const auto& req, auto& res) {
         Json::Value json;
 
