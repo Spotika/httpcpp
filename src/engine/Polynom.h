@@ -1,9 +1,11 @@
 #pragma once
 
+#include <cstdlib>
 #include <stdexcept>
 #include <iostream>
 #include <sstream>
 #include <string>
+#include <vector>
 #include <cmath>
 
 #include "LinkedList.h"
@@ -233,6 +235,61 @@ public:
         return result;
     }
 
+    std::vector<int> FindRoots() const {
+        int variable = 0;
+
+        std::vector<int> roots;
+
+        for (int i = 0; i < polynom.getSize(); ++i) {
+            for (int j = 0; j < 26; ++j) {
+                if (polynom[i].powers[j] != 0) {
+                    variable = j;
+                    goto end;        
+                }
+            }
+        }
+
+        end:
+
+        int minWeight = 0;
+        int currnetSumOfPowers = 1e9;
+        for (int i = 0; i < polynom.getSize(); ++i) {
+            if (polynom[i].SumOfPowers() < currnetSumOfPowers) {
+                minWeight = static_cast<int>(polynom[i].weight);
+                currnetSumOfPowers = static_cast<int>(polynom[i].SumOfPowers());
+            }
+        }
+
+        std::vector<int> possible_roots = {0, 1};
+
+        minWeight = abs(minWeight);
+
+        for (int i = 2; i <= minWeight; ++i) {
+            if (minWeight % i == 0) {
+                possible_roots.push_back(i);
+            }
+        }
+
+
+        for (int i = 0; i < possible_roots.size(); ++i) {
+            double point[26] = {};
+            point[variable] = possible_roots[i];
+            double value = CalculateValueInPoint(point);
+
+            if (std::fabs(value) < 0.001) {
+                roots.push_back(possible_roots[i]);
+            }
+
+            point[variable] = -possible_roots[i];
+            value = CalculateValueInPoint(point);
+
+            if (std::fabs(value) < 0.001 && possible_roots[i]!= 0) {
+                roots.push_back(-possible_roots[i]);
+            }
+        }
+        return roots;
+    }
+
     void read_from_string(std::string string) override {
         polynom.Clear();
 
@@ -357,7 +414,7 @@ public:
         Normalize_();
     }
 
-    double CalculateValueInPoint(double point[]) {
+    double CalculateValueInPoint(double point[]) const {
         double result = 0;
 
         for (int i = 0; i < polynom.getSize(); ++i) {
@@ -386,7 +443,6 @@ public:
     }
 
     Polynom operator+(const Polynom& other) const {
-
         Polynom result;
 
         for (int i = 0; i < polynom.getSize(); ++i) {

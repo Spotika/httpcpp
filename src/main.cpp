@@ -159,6 +159,23 @@ int main() {
         JSON_RESPONSE(json);
     });
 
+    svr.Get("/findRoots", [&database](const auto& req, auto& res) {
+        Json::Value json;
+
+        Polynom pol(req.get_param_value("polynom"));
+
+
+        std::vector<int> findRoots = pol.FindRoots();
+
+        json["response"];
+
+        for (int i = 0; i < findRoots.size(); i++) {
+            json["response"][i] = findRoots[i];
+        }
+
+        JSON_RESPONSE(json);
+    });
+
     svr.set_exception_handler([](auto& req, auto& res, std::exception_ptr ex) {
         Json::Value json;
 
