@@ -134,6 +134,18 @@ int main() {
         JSON_RESPONSE(json);
     });
 
+    svr.Get("/getTheNthDerivative", [](const auto& req, auto& res){
+        Json::Value json;
+
+        Polynom pol(req.get_param_value("polynom"));
+        char target = req.get_param_value("target")[0];
+        int nth = std::stoi(req.get_param_value("nth"));
+
+
+        json["response"] = pol.GetTheNthDerivative(nth, target).write_to_string();
+
+        JSON_RESPONSE(json);
+    });
 
     svr.Get("/compare", [&database](const auto& req, auto& res) {
         Json::Value json;

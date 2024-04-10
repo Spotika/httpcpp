@@ -162,6 +162,30 @@ public:
             return true;
         }
 
+        Term GetTheNthDerivative(int n, char target) const {
+            Term result;
+
+            int targetIndex = target - 'a';
+
+            for (int i = 0; i < 26; ++i) {
+                result.powers[i] = powers[i];                
+            }
+
+            result.weight = weight;
+
+            while (n --> 0) {
+                if (powers[targetIndex] == 0) {
+                    result.weight = 0;
+                    return result;
+                }
+
+                result.weight *= result.powers[targetIndex];
+                result.powers[targetIndex] = result.powers[targetIndex] - 1;
+            }
+
+            return result;
+        }
+
         Term operator*(const Term& other) const {
             Term result;
 
@@ -183,6 +207,19 @@ public:
 
     Polynom(std::string polynomstring) {
         read_from_string(polynomstring);
+    }
+
+    Polynom GetTheNthDerivative(int n, char target) const {
+        Polynom result;
+
+        result.polynom = polynom;
+
+        for (int i = 0; i < polynom.getSize(); ++i) {
+            result.polynom[i] = polynom[i].GetTheNthDerivative(n, target);
+        }
+
+        result.Normalize_();
+        return result;
     }
 
     std::string write_to_string() override {
