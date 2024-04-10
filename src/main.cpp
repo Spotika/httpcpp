@@ -58,9 +58,8 @@ int main() {
         JSON_RESPONSE(json);
     });
 
-    svr.Post("/add", [&database](const auto& req, auto& res) {
+    svr.Post("/insert", [&database](const auto& req, auto& res) {
         Json::Value json;
-        json["response"] = "OK";
 
         std::string pol = req.get_param_value("polynom");
         // std::cout << pol << std::endl;
@@ -75,7 +74,7 @@ int main() {
 
         database.Push(p);
 
-        json["polynom"] = p.write_to_string();
+        json["response"] = p.write_to_string();
 
         JSON_RESPONSE(json);
     });
@@ -112,6 +111,17 @@ int main() {
             JSON_RESPONSE(json);
         }
     );
+
+    svr.Get("/add", [&database](const auto& req, auto& res) {
+        Json::Value json;
+        
+        Polynom lhs(req.get_param_value("lhs"));
+        Polynom rhs(req.get_param_value("rhs"));
+
+        json["response"] = (lhs + rhs).write_to_string();
+
+        JSON_RESPONSE(json);
+    });
 
     svr.Get("/compare", [&database](const auto& req, auto& res) {
         Json::Value json;

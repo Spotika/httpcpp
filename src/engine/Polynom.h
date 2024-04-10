@@ -22,6 +22,7 @@ public:
         ~Term() = default;
 
         std::string write_to_string() override {
+            const double EPS = 0.001;
             std::string result;
 
             if (weight == 0) {
@@ -43,10 +44,18 @@ public:
                 if (flag) {
                     result += "-";
                 } else {
-                    result += std::to_string(weight);
+                    if (std::fabs((int)weight - weight) < EPS) {
+                        result += std::to_string((int)weight);
+                    } else {
+                        result += std::to_string(weight);
+                    }
                 }
             } else {
-                result += std::to_string(weight);
+                if (std::fabs((int)weight - weight) < EPS) {
+                    result += std::to_string((int)weight);
+                } else {
+                    result += std::to_string(weight);
+                }
             }
             
             for (int i = 0; i < 26; ++i) {
@@ -177,6 +186,12 @@ public:
 
     void read_from_string(std::string string) override {
         polynom.Clear();
+
+        if (string.empty()) {
+            polynom.Push({});
+            Normalize_();
+            return;
+        }
         
         enum STATE { 
             BEGIN = 0,
@@ -319,6 +334,22 @@ public:
             }
         }
         return true;
+    }
+
+    Polynom operator+(const Polynom& other) const {
+
+        Polynom result;
+
+        for (int i = 0; i < polynom.getSize(); ++i) {
+            result.polynom.Push(polynom[i]);
+        }
+
+        for (int i = 0; i < other.polynom.getSize(); ++i) {
+            result.polynom.Push(other.polynom[i]);
+        }
+
+        result.Normalize_();
+        return result;
     }
 
 private:
