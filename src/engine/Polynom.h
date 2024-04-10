@@ -317,7 +317,7 @@ public:
         char current;
         char current_pow_target = ' ';
         for (int i = 0; i < string.size(); ++i) {
-            if (string[i] == ' ') continue;
+            if (string[i] == ' ' || string[i] == '{' || string[i] == '}') continue;
             switch (state) {
                 case BEGIN: // Начало парсинга
                     if (string[i] == '-') {
