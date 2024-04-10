@@ -4,6 +4,7 @@
 #include <iostream>
 #include <sstream>
 #include <string>
+#include <cmath>
 
 #include "LinkedList.h"
 #include "IWriteble.h"
@@ -146,8 +147,25 @@ public:
             }
         }
 
-        polynom_.Sort();
         Normalize_();
+    }
+
+    double CalculateValueInPoint(
+        double point[]
+    ) {
+        double result = 0;
+
+        for (int i = 0; i < polynom_.getSize(); ++i) {
+            double sum = 1;
+            for (int j = 0; j < 26; ++j) {
+                sum *= std::pow(point[j], polynom_[i].powers[j]);
+            }
+            sum *= polynom_[i].weight;
+
+            result += sum;
+        }
+
+        return result;
     }
 
 private:
@@ -281,8 +299,9 @@ private:
     };
 
     void Normalize_() {
-        LinkedList<Term> sp;
+        polynom_.Sort();
 
+        LinkedList<Term> sp;
 
         Term current_term = polynom_[0];
 

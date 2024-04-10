@@ -4,6 +4,7 @@
 #include <json/value.h>
 #include<map>
 #include<string>
+#include <iostream>
 #include<json/json.h>
 #include "Exception.h"
 

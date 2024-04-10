@@ -15,7 +15,6 @@
 #include "engine/Polynom.h"
 
 int main() {
-
     httplib::Server svr;
 
     LinkedList<Polynom> database;
@@ -84,13 +83,37 @@ int main() {
     svr.Get("/list", [&database](const auto& req, auto& res) {
         Json::Value json;
         auto &response = json["response"];
-
         for (int i = 0; i < database.getSize(); i++) {
             response[i] = database[i].write_to_string();
         }
 
         JSON_RESPONSE(json);
     });
+
+    svr.Get("/calculate", 
+        [&database](const httplib::Request &req, httplib::Response &res) {
+
+            
+            Json::Reader reader;    
+
+            Json::Value inputArray;
+
+            bool parsingSuccessful = reader.parse(req.get_param_value("point"), inputArray);
+
+            double variables[26] = {};
+            for (int i = 0; i < 26; i++) {
+                variables[i] = inputArray[i].asDouble();
+            }
+
+            Polynom p(req.get_param_value("polynom"));
+            
+
+            Json::Value json;
+            json["response"] = p.CalculateValueInPoint(variables);
+
+            JSON_RESPONSE(json);
+        }
+    );
 
     svr.set_exception_handler([](auto& req, auto& res, std::exception_ptr ex) {
         Json::Value json;
