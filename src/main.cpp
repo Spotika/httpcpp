@@ -176,6 +176,20 @@ int main() {
         JSON_RESPONSE(json);
     });
 
+    svr.Get("/divide", [&database](const auto& req, auto& res) {
+        Json::Value json;
+
+        Polynom lhs(req.get_param_value("lhs"));
+        Polynom rhs(req.get_param_value("rhs"));
+
+        auto result = lhs / rhs;
+
+        json["div"] = result.first.write_to_string();
+        json["mod"] = result.second.write_to_string();
+
+        JSON_RESPONSE(json);
+    });
+
     svr.set_exception_handler([](auto& req, auto& res, std::exception_ptr ex) {
         Json::Value json;
 

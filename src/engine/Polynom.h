@@ -199,6 +199,20 @@ public:
 
             return result;
         }
+
+        bool operator<=(const Term& other) const {
+            return static_cast<int>(SumOfPowers()) - static_cast<int>(other.SumOfPowers()) >= 0;
+        }
+
+        Term operator/(const Term& other) const {
+            Term result;
+
+            for (int i = 0; i < 26; ++i) {
+                result.powers[i] = std::max(0, powers[i] - other.powers[i]);
+            }
+            result.weight = weight / other.weight;
+            return result;
+        }
     };
 
     LinkedList<Term> polynom;
@@ -428,6 +442,27 @@ public:
         }
 
         return result;
+    }
+
+    std::pair<Polynom, Polynom> operator/(const Polynom& other) const {
+        Polynom div;
+
+        Polynom lhs = *this;
+        Polynom rhs = other;
+
+        while (lhs.polynom[0] <= rhs.polynom[0]) {
+            auto local_ans = lhs.polynom[0] / rhs.polynom[0];
+
+            div.polynom.Push(local_ans);
+
+            auto decr = rhs * local_ans * Polynom("-1");
+            lhs = lhs + decr;
+        }
+
+        div.Normalize_();
+        lhs.Normalize_();
+
+        return {div, lhs};
     }
 
     bool operator==(const Polynom& other) const {
