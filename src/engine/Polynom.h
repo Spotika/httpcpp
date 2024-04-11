@@ -241,9 +241,13 @@ public:
     std::string write_to_string() override {
         std::string result;
         for (int i = 0; i < polynom.getSize(); ++i) {
-            result += polynom[i].write_to_string();
+            std::string term = polynom[i].write_to_string();
+            if (!term.empty() && term[0] == '-' && !result.empty()) {
+                result.pop_back();
+            }
+            result += term;
             if (i != polynom.getSize() - 1) {
-                result += " + ";
+                result += "+";
             }
         }
         return result;
