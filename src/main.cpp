@@ -209,6 +209,22 @@ int main() {
         JSON_RESPONSE(json);
     });
 
+    svr.Post("/delete", [&database](const auto& req, auto& res) {
+        Json::Value json;
+
+        Polynom pol(req.get_param_value("polynom"));
+
+        for (int i = 0; i < database.getSize(); i++) {
+            if (database[i] == pol) {
+                database.Pop(i);
+                break;
+            }
+        }
+
+        json["response"] = "OK";
+
+        JSON_RESPONSE(json);
+    });
 
     svr.listen("127.0.0.1", 4242);
 

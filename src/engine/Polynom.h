@@ -311,6 +311,19 @@ public:
     void read_from_string(std::string string) override {
         polynom.Clear();
 
+        string += "+1-1";
+
+        if (string == "+" || string == "-") {
+            throw std::invalid_argument("GO FUCK YOURSELF!!!");
+        }
+        for (int i = 0; i < (int)string.size() - 1; ++i) {
+            if ((string[i] == '+' || string[i] == '-') && (string[i + 1] == '+' || string[i + 1] == '-')) {
+                throw std::invalid_argument(
+                    "Expected expression on position " + std::to_string((i + 1))
+                );
+            }
+        }
+
         if (string.empty()) {
             polynom.Push({});
             Normalize_();
@@ -455,6 +468,11 @@ public:
         Polynom rhs = other;
 
         while (lhs.polynom[0] <= rhs.polynom[0]) {
+
+            if (lhs.polynom[0].ComparePowerLiterals(rhs.polynom[0])) {
+                throw std::invalid_argument("TEST");
+            }
+            
             auto local_ans = lhs.polynom[0] / rhs.polynom[0];
 
             div.polynom.Push(local_ans);

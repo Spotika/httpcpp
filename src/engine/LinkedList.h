@@ -76,6 +76,10 @@ public:
         Erase_(current_node);
     }
 
+    ~LinkedList() {
+        // Clear();
+    }
+
 private:
     struct Node {
         T* data = nullptr;
